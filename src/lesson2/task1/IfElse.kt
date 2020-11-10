@@ -155,9 +155,9 @@ fun rookOrBishopThreatens(
  * Если такой треугольник не существует, вернуть -1.
  */
 fun triangleKind(a: Double, b: Double, c: Double): Int {
-    var m = 0.0
-    var n = 0.0
-    var v = 0.0
+    val m: Double
+    val n: Double
+    val v: Double
     if ((a > b) && (a > c)) {
         m = a; n = b; v = c
     } else if ((b > a) && (b > c)) {
@@ -185,11 +185,11 @@ fun triangleKind(a: Double, b: Double, c: Double): Int {
  * Если пересечения нет, вернуть -1.
  */
 fun segmentLength(a: Int, b: Int, c: Int, d: Int): Int {
-    if (c in a..b) {
-        return if (d in a..b) d - c else b - c
+    return if (c in a..b) {
+        if (d in a..b) d - c else b - c
     } else if (a in c..d) {
-        return if (b in c..d) b - a else d - a
-    } else return -1
+        if (b in c..d) b - a else d - a
+    } else -1
 }
 
 
