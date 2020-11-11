@@ -73,15 +73,8 @@ fun circleInside(
  * Вернуть true, если кирпич пройдёт
  */
 fun brickPasses(a: Int, b: Int, c: Int, r: Int, s: Int): Boolean {
-    val ab = a * 1000 + b
-    val ba = b * 1000 + a
-    val bc = b * 1000 + c
-    val cb = c * 1000 + b
-    val ca = c * 1000 + a
-    val ac = a * 1000 + c
-
-    val wall = r * 1000 + s
-
-
-    return (wall >= ab) || (wall >= bc) || (wall >= ca) || (wall >= ba) || (wall >= cb) || (wall >= ac)
+    return ((a <= r) && (b <= s)) || ((a <= r) && (c <= s)) ||
+            ((b <= r) && (a <= s)) || ((b <= r) && (c <= s)) ||
+            ((c <= r) && (a <= s)) || ((c <= r) && (b <= s))
+    //((a <= r) && (b <= s)) || ((b <= r) && (c <= s)) || ((c <= r) && (a <= s)) || ((a <= r) && (c <= s))
 }
