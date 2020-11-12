@@ -3,9 +3,7 @@
 package lesson3.task1
 
 import lesson1.task1.sqr
-import kotlin.math.abs
-import kotlin.math.pow
-import kotlin.math.sqrt
+import kotlin.math.*
 
 /**
  * Пример
@@ -155,6 +153,7 @@ fun isCoPrime(m: Int, n: Int): Boolean {
  * Например, для интервала 21..28 21 <= 5*5 <= 28, а для интервала 51..61 квадрата не существует.
  */
 fun squareBetweenExists(m: Int, n: Int): Boolean {
+    if (m == 0 && n == 0) return true
     val maxSqr = sqrt(n.toDouble()).toInt()
     for (s in maxSqr downTo 1) {
         val ss = sqr(s.toDouble()).toInt()
@@ -189,6 +188,8 @@ fun collatzSteps(x: Int): Int {
     return count
 }
 
+
+
 /**
  * Средняя
  *
@@ -207,7 +208,16 @@ fun sin(x: Double, eps: Double): Double {
         t *= -((x / (n + 1)) * (x / (n + 2)))
         n += 2
     }
-    return s
+    return (if (s > 0) 1.0 / s else s).roundToInt().toDouble()
+}
+
+fun main(args: Array<String>) {
+    println(sin(0.0, 1e-5))
+    println(sin(PI / 2, 1e-5))
+    println(sin(100 * PI, 1e-5))
+    println(sin(-18.84955592153876, 1.0E-10))
+    println(sin(1.0, 1.0))
+    println(kotlin.math.sin(1.0))
 }
 
 /**
@@ -223,14 +233,16 @@ fun cos(x: Double, eps: Double): Double {
     var s = 0.0
     var t = 1.0
     var n = 0
+    val xx = if (digitNumber(x.toInt()) > 1) x / ((10.0).pow(digitNumber(x.toInt()))) else x
 
     while (abs(t) > eps) {
         s += t
         n++
-        t *= -x * x / (2.0 * n - 1.0) / (2.0 * n)
+        t *= -xx * xx / (2.0 * n - 1.0) / (2.0 * n)
     }
-    return s
+    return s.roundToInt().toDouble()
 }
+
 
 /**
  * Средняя
@@ -283,11 +295,13 @@ fun hasDifferentDigits(n: Int): Boolean {
 fun createDigit(d1: Int, d2: Int): Int = d1 * 10.0.pow(digitNumber(d2)).toInt() + d2
 
 fun numByPosition(d: Int, position: Int, rev: Boolean = false): Int {
-    var dd = if (rev) revert(d) else d
+    var dd = d
     var result: Int = -1
-    for (i in 1..position) {
+    val pos = if (rev) digitNumber(d) - position + 1 else position
+    for (i in 1..pos) {
         result = dd % 10
         dd /= 10
+        println("d=$d; dd=$dd; r=$result")
     }
     return result
 }
@@ -308,6 +322,7 @@ fun squareSequenceDigit(n: Int): Int {
     for (i in 1..n) {
         dSqr = sqr(i)
         dLen = digitNumber(dSqr)
+//        println("dSqr=$dSqr; dLen=$dLen; nn=$nn; n=$n")
         if (dLen >= nn) {
             return numByPosition(dSqr, nn, rev = true)
         }
@@ -315,6 +330,7 @@ fun squareSequenceDigit(n: Int): Int {
     }
     return -1
 }
+
 
 /**
  * Сложная
