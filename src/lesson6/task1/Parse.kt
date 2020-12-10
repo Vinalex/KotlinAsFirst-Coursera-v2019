@@ -2,7 +2,6 @@
 
 package lesson6.task1
 
-import lesson4.task1.roman
 
 /**
  * Пример
