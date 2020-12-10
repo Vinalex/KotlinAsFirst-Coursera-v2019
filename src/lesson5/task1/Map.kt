@@ -420,7 +420,7 @@ fun bagPacking(treasures: Map<String, Pair<Int, Int>>, capacity: Int): Set<Strin
     for ((tName, tParam) in treasures) {
 //        bagPack.clear()
 //        totalPrice = 0
-        if (tParam.first < freeCapacity) {
+        if (tParam.first <= freeCapacity) {
 
             bagPack.add(tName)
             freeCapacity -= tParam.first
@@ -435,5 +435,6 @@ fun bagPacking(treasures: Map<String, Pair<Int, Int>>, capacity: Int): Set<Strin
         }
         result[bagPack] = totalPrice
     }
-    return result.maxBy { it.value }!!.key
+    val r = result.maxBy { it.value }
+    return r?.key ?: setOf()
 }

@@ -2,6 +2,8 @@
 
 package lesson6.task1
 
+import lesson4.task1.roman
+
 /**
  * Пример
  *
@@ -42,7 +44,7 @@ fun timeSecondsToStr(seconds: Int): String {
 /**
  * Пример: консольный ввод
  */
-fun main() {
+fun amain() {
     println("Введите время в формате ЧЧ:ММ:СС")
     val line = readLine()
     if (line != null) {
@@ -58,6 +60,13 @@ fun main() {
 }
 
 
+fun daysInMonth(month: Int, year: Int): Int = when (month) {
+    in listOf<Int>(1, 3, 5, 7, 8, 10, 12) -> 31
+    in listOf<Int>(4, 6, 9, 11) -> 30
+    2 -> if ((year % 4 == 0) && (year % 100 != 0)) 29 else if ((year % 100 == 0) && (year % 400 == 0)) 29 else 28
+    else -> -1
+}
+
 /**
  * Средняя
  *
@@ -69,7 +78,46 @@ fun main() {
  * Обратите внимание: некорректная с точки зрения календаря дата (например, 30.02.2009) считается неверными
  * входными данными.
  */
-fun dateStrToDigit(str: String): String = TODO()
+fun dateStrToDigit(str: String): String {
+    val months = listOf(
+        "января",
+        "февраля",
+        "марта",
+        "апреля",
+        "мая",
+        "июня",
+        "июля",
+        "августа",
+        "сентября",
+        "октября",
+        "ноября",
+        "декабря"
+    )
+    val date = str.split(' ').map { it.trim().toLowerCase() }
+
+    try {
+        if (date.size != 3) throw Exception("Неверные входные данные: $str")
+        val month = months.indexOf(date[1]) + 1
+        val day = date[0].toInt()
+        val year = date[2].toInt()
+
+        if (
+            ((month < 1) || (month > 12)) ||
+            (year < 1) ||
+            ((day < 1) || (day > daysInMonth(month, year)))
+        ) {
+            throw Exception("Неверный формат данных. day='$day', month='$month', year='$year'")
+        }
+
+        return String.format("%02d.%02d.%d", day, month, year)
+
+    } catch (e: Exception) {
+        //e.printStackTrace()
+        return ""
+    }
+
+
+}
 
 /**
  * Средняя
@@ -81,7 +129,43 @@ fun dateStrToDigit(str: String): String = TODO()
  * Обратите внимание: некорректная с точки зрения календаря дата (например, 30 февраля 2009) считается неверными
  * входными данными.
  */
-fun dateDigitToStr(digital: String): String = TODO()
+fun dateDigitToStr(digital: String): String {
+    val months = listOf(
+        "января",
+        "февраля",
+        "марта",
+        "апреля",
+        "мая",
+        "июня",
+        "июля",
+        "августа",
+        "сентября",
+        "октября",
+        "ноября",
+        "декабря"
+    )
+    val splitString = digital.split('.').map { it.trim() }
+    try {
+        if (splitString.size != 3) throw Exception("Неверные входные данные: $digital")
+        val day = splitString[0].toInt()
+        val month = splitString[1].toInt()
+        val year = splitString[2].toInt()
+
+        if (
+            ((month < 1) || (month > 12) || month > months.size) ||
+            (year < 1) ||
+            ((day < 1) || (day > daysInMonth(month, year)))
+        ) {
+            throw Exception("Неверный формат данных. day='$day', month='$month', year='$year'")
+        }
+
+        return String.format("%d %s %d", day, months[month - 1], year)
+    } catch (e: Exception) {
+        //e.printStackTrace()
+        return ""
+    }
+
+}
 
 /**
  * Средняя
@@ -97,7 +181,18 @@ fun dateDigitToStr(digital: String): String = TODO()
  *
  * PS: Дополнительные примеры работы функции можно посмотреть в соответствующих тестах.
  */
-fun flattenPhoneNumber(phone: String): String = TODO()
+fun flattenPhoneNumber(phone: String): String {
+    if (("+" in phone) && (!phone.startsWith("+"))) return ""
+    if (("()" in phone) || (")(" in phone)) return ""
+    val symList = listOf('+', '-', '(', ')', ' ')
+    val phoneSym = phone.filter { !it.isDigit() }
+    if (!phoneSym.all { it in symList }) return ""
+
+    val phoneNumber = phone.filter { it.isDigit() }
+
+    return "${if (phone.startsWith("+")) "+" else ""}$phoneNumber"
+}
+
 
 /**
  * Средняя
@@ -109,7 +204,11 @@ fun flattenPhoneNumber(phone: String): String = TODO()
  * Прочитать строку и вернуть максимальное присутствующее в ней число (717 в примере).
  * При нарушении формата входной строки или при отсутствии в ней чисел, вернуть -1.
  */
-fun bestLongJump(jumps: String): Int = TODO()
+fun bestLongJump(jumps: String): Int {
+    val symList = listOf("-", "%")
+    if (!jumps.split(" ").filter { it.toIntOrNull() == null }.all { it in symList }) return -1
+    return jumps.split(" ").filter { it.toIntOrNull() != null }.map { it.toInt() }.max() ?: -1
+}
 
 /**
  * Сложная
@@ -122,7 +221,21 @@ fun bestLongJump(jumps: String): Int = TODO()
  * При нарушении формата входной строки, а также в случае отсутствия удачных попыток,
  * вернуть -1.
  */
-fun bestHighJump(jumps: String): Int = TODO()
+fun bestHighJump(jumps: String): Int {
+    val sym = listOf("+", "%", "-")
+    val height = jumps.split(' ').filter { it.toIntOrNull() != null }.map { it.toInt() }
+    val attempt = jumps.split(' ').filter { it.toIntOrNull() == null }
+    var max = -1
+    val pairs = height.zip(attempt)
+    if (pairs.size != height.size || pairs.size != attempt.size) return -1
+    pairs.forEach { (h, a) ->
+        if (!a.all { it.toString() in sym }) return -1
+        if (a.startsWith('+') && (h > max)) {
+            max = h
+        }
+    }
+    return max
+}
 
 /**
  * Сложная
@@ -133,7 +246,42 @@ fun bestHighJump(jumps: String): Int = TODO()
  * Вернуть значение выражения (6 для примера).
  * Про нарушении формата входной строки бросить исключение IllegalArgumentException
  */
-fun plusMinus(expression: String): Int = TODO()
+fun plusMinus(expression: String): Int {
+    val validSym = listOf("+", "-")
+    var result: Int = 0
+    var prevSym: String? = null
+    for (sym in expression.split(" ")) {
+//        println("$result, $prevSym, $sym")
+        when {
+            (sym in validSym) -> {
+                if ((prevSym == null) || (prevSym in validSym)) {
+                    throw IllegalArgumentException()
+                }
+                prevSym = sym
+            }
+            ((sym.toInt() >= 0) && (sym.first().toString().toIntOrNull() != null)) -> {
+                if (prevSym == null) {
+                    result = sym.toInt()
+                    prevSym = sym
+                } else {
+                    if (prevSym in validSym) {
+                        when (prevSym) {
+                            "+" -> result += sym.toInt()
+                            "-" -> result -= sym.toInt()
+                        }
+                    } else {
+                        throw IllegalArgumentException()
+                    }
+                }
+                prevSym = ""
+            }
+            else -> throw IllegalArgumentException()
+        }
+    }
+//    println("$expression -> $result")
+    return result
+
+}
 
 /**
  * Сложная
@@ -144,7 +292,26 @@ fun plusMinus(expression: String): Int = TODO()
  * Вернуть индекс начала первого повторяющегося слова, или -1, если повторов нет.
  * Пример: "Он пошёл в в школу" => результат 9 (индекс первого 'в')
  */
-fun firstDuplicateIndex(str: String): Int = TODO()
+fun firstDuplicateIndex(str: String): Int {
+
+    val strSplit = str.toLowerCase().split(" ")
+    if (strSplit.isEmpty() || strSplit.size < 2) return -1
+
+    var word: String? = null
+    var prevStr = strSplit.first()
+
+    for (curStr in strSplit.subList(1, strSplit.size - 1)) {
+        if (prevStr == curStr) {
+            word = curStr
+            break
+        }
+        prevStr = curStr
+    }
+    if (word == null) return -1
+
+    return str.toLowerCase().indexOf("$word $word")
+
+}
 
 /**
  * Сложная
@@ -157,7 +324,19 @@ fun firstDuplicateIndex(str: String): Int = TODO()
  * или пустую строку при нарушении формата строки.
  * Все цены должны быть больше либо равны нуля.
  */
-fun mostExpensive(description: String): String = TODO()
+fun mostExpensive(description: String): String {
+    val items = description.split(";").map { it.trim() }
+    val costs = mutableMapOf<String, Double>()
+    try {
+        items.forEach {
+            val (name, coast) = it.split(" ")
+            costs[name] = coast.toDouble()
+        }
+    } catch (e: Exception) {
+        return ""
+    }
+    return costs.maxBy { it.value }?.key ?: ""
+}
 
 /**
  * Сложная
@@ -170,7 +349,44 @@ fun mostExpensive(description: String): String = TODO()
  *
  * Вернуть -1, если roman не является корректным римским числом
  */
-fun fromRoman(roman: String): Int = TODO()
+
+fun fromRoman(roman: String): Int {
+    var result = 0
+    val tree = mapOf(
+        'I' to mapOf('_' to 1, 'V' to 4, 'X' to 9),
+        'V' to mapOf('_' to 5),
+        'X' to mapOf('_' to 10, 'L' to 40, 'C' to 90),
+        'L' to mapOf('_' to 50),
+        'C' to mapOf('_' to 100, 'D' to 400, 'M' to 900),
+        'D' to mapOf('_' to 500),
+        'M' to mapOf('_' to 1000)
+    )
+    if (roman.isEmpty) return -1
+    var subTree: Map<Char, Int>
+    var curSym: Char
+    var nextSym: Char
+
+    var i = 0
+    val lastIndex = roman.length - 1
+    while (i <= lastIndex) {
+        curSym = roman[i]
+        subTree = tree[curSym] ?: return -1
+        if (i == lastIndex) {
+            result += subTree['_'] ?: return -1
+            break
+        } else {
+            nextSym = roman[i + 1]
+            if (nextSym in subTree) {
+                i += 2
+                result += subTree[nextSym] ?: return -1
+            } else {
+                i++
+                result += subTree['_'] ?: return -1
+            }
+        }
+    }
+    return result
+}
 
 /**
  * Очень сложная
